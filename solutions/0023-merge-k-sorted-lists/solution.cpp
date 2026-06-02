@@ -14,38 +14,40 @@ public:
 
     struct compare {
         bool operator()(ListNode* a, ListNode* b) {
-            return a->val > b->val;
+            return a->val > b->val; // min heap
         }
     };
 
     ListNode* mergeKLists(vector<ListNode*>& lists) {
 
-        priority_queue<ListNode*, vector<ListNode*>, compare> pq;
+        priority_queue<
+            ListNode*,
+            vector<ListNode*>,
+            compare
+        > pq;
 
-        // heap me sab lists ke first nodes daalo
-        for(int i = 0; i < lists.size(); i++) {
-            if(lists[i] != NULL) {
-                pq.push(lists[i]);
+        for (auto node : lists) {
+            if (node) {
+                pq.push(node);
             }
         }
 
-        ListNode* dummy = new ListNode(-1);
-        ListNode* tail = dummy;
+        ListNode dummy(0);
+        ListNode* tail = &dummy;
 
-        while(!pq.empty()) {
+        while (!pq.empty()) {
 
-            ListNode* temp = pq.top();
+            ListNode* curr = pq.top();
             pq.pop();
 
-            tail->next = temp;
+            tail->next = curr;
             tail = tail->next;
 
-            // next node heap me daalo
-            if(temp->next != NULL) {
-                pq.push(temp->next);
+            if (curr->next) {
+                pq.push(curr->next);
             }
         }
 
-        return dummy->next;
+        return dummy.next;
     }
 };
