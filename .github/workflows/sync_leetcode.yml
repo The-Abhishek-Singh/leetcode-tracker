@@ -3,15 +3,15 @@ name: Sync LeetCode Solutions
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 0 * * *"
+    - cron: "*/30 * * * *"
 
 jobs:
-  build:
+  sync:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Sync Solutions
-        uses: joshcai/leetcode-sync@v1.7
+      - name: Sync LeetCode Solutions
+        uses: joshcai/leetcode-sync@master
         with:
           github-token: ${{ secrets.PAT_TOKEN }}
           leetcode-csrf-token: ${{ secrets.LEETCODE_CSRF_TOKEN }}
