@@ -5,6 +5,9 @@ on:
   schedule:
     - cron: "*/30 * * * *"
 
+permissions:
+  contents: write
+
 jobs:
   sync:
     runs-on: ubuntu-latest
@@ -12,17 +15,29 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.PAT_TOKEN }}
 
-      - name: Install glsync
-        run: |
-          go install github.com/ahmed-e-abdulaziz/glsync@latest
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
 
       - name: Sync LeetCode
         env:
-          LEETCODE_COOKIE: ${{ secrets.LEETCODE_SESSION }}
+          LEETCODE_SESSION: ${{ secrets.LEETCODE_SESSION }}
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
         run: |
-          glsync \
-            -lc-cookie="$LEETCODE_COOKIE" \
-            -repo-url="https://github.com/${{ github.repository }}.git"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          npx --yes leetcode-sync \
+            --session "$LEETCODE_SESSION" \
+            --output "./solutions"
+
+          git add solutions
+
+          if git diff --cached --quiet; then
+            echo "No new solutions to sync."
+          else
+            git commit -m "Sync LeetCode solutions"
+            git push
+          fi
